@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import express, { response } from 'express';
+import express from 'express';
 import * as bodyParser from 'body-parser';
 import { urlShortenRouter } from './src/routes';
 import { db } from './db';
