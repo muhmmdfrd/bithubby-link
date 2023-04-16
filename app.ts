@@ -10,6 +10,9 @@ dotenv.config();
 
 app.use(bodyParser.json());
 app.use('/api/url-shorten', urlShortenRouter);
+app.use('/api/test', function (req, res, next) {
+  res.status(200).json({ message: 'OK' });
+});
 app.use('/:code', function (req, res, next) {
   const code = req.baseUrl.replace('/', '');
 
