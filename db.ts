@@ -1,5 +1,7 @@
-require('dotenv-vault-core').config();
+import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
+
+dotenv.config();
 
 export const db = new Sequelize(
   process.env.DB_NAME ?? '',
@@ -8,5 +10,6 @@ export const db = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: 'mysql',
+    dialectModule: require('mysql2'),
   }
 );
