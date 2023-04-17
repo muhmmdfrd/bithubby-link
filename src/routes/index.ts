@@ -1,3 +1,3 @@
-import urlShortenRouter from './url_shorten_router';
+import SubscriberRoute from './subsriber_route';
 
-export { urlShortenRouter };
+export { SubscriberRoute };

@@ -1,3 +1,3 @@
-import UrlShortenController from './url_shorten_controller';
+import SubscriberController from './subscriber_controller';
 
-export { UrlShortenController };
+export { SubscriberController };
