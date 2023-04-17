@@ -4,8 +4,11 @@ import dotenv from 'dotenv';
 import { initModels, subscribers } from '../models/init-models';
 import { Telegraf } from 'telegraf';
 import { INotifyRequest } from './../custom/dto/notify_request';
+import { IWebhookRequest } from './../../src/custom/dto/webhook_request';
 
 export default class SubscriberController {
+  private bot = new Telegraf(process.env.TELEGRAM_TOKEN);
+
   async get(): Promise<subscribers[]> {
     return await initModels(db).subscribers.findAll({
       attributes: ['id', 'name', 'telegram_id', 'email'],
@@ -25,9 +28,8 @@ export default class SubscriberController {
     const datas = await initModels(db).subscribers.findAll({
       attributes: ['telegram_id'],
     });
-    const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
-    const telegramHelper = new TelegramHelper(bot);
+    const telegramHelper = new TelegramHelper(this.bot);
 
     datas.forEach(function (data) {
       const message = `Halo pembaca, bithubby.com sudah update post yang berjudul '${request.message}'. Selamat membaca.`;
@@ -35,5 +37,58 @@ export default class SubscriberController {
     });
 
     return true;
+  }
+
+  async register(update: IWebhookRequest): Promise<void> {
+    if (update.message.text !== '/start') {
+      this.bot.telegram.sendMessage(
+        update.message.chat.id,
+        "Silakan ketik '/start' untuk menghubungkan Telegram dengan bithubby.com"
+      );
+      return;
+    }
+
+    const utc = new Date(new Date().toUTCString());
+    const id = update.message.chat.id.toString();
+    let fullName = update.message.from.first_name;
+
+    if (update.message.from.last_name) {
+      fullName = `${update.message.from.first_name} ${update.message.from.last_name}`;
+    }
+
+    const exist = await initModels(db).subscribers.findOne({
+      where: {
+        telegram_id: id,
+      },
+    });
+
+    if (exist) {
+      this.bot.telegram.sendMessage(
+        update.message.chat.id,
+        `${fullName}, Anda sudah terhubung dengan bithubby.com. Stay tuned :)`
+      );
+    } else {
+      const data = initModels(db).subscribers.build({
+        name: fullName,
+        email: '-',
+        telegram_id: update.message.chat.id.toString(),
+        created_at: utc,
+        updated_at: utc,
+      });
+
+      const result = await data.save();
+
+      if (result) {
+        this.bot.telegram.sendMessage(
+          update.message.chat.id,
+          `Selamat ${fullName}, Anda sudah berhasil terhubung dengan bithubby.com. Selamat membaca dan stay tuned. Terima kasih :)`
+        );
+
+        this.bot.telegram.sendMessage(
+          '612060297',
+          `${fullName} (${update.message.from.username}) mendaftar di bithubby.com`
+        );
+      }
+    }
   }
 }

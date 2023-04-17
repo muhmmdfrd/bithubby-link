@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
-    "dev": "tsc && nodemon dist/app.js"
+    "dev": "tsc && nodemon app.ts",
+    "build": "tsc"
   },
   "keywords": [
     "api",

@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import { SubscriberController } from '../controllers';
+import debug from 'debug';
+import { IWebhookRequest } from './../custom/dto/webhook_request';
 
 const app = express.Router();
 const controller = new SubscriberController();
@@ -27,6 +29,12 @@ app.post('/notify', async function (request: Request, response: Response) {
   } else {
     response.status(500).json({ message: 'Failed to notify users.' });
   }
+});
+
+app.post('/register', async function (request: Request, response: Response) {
+  const body = request.body as IWebhookRequest;
+  const data = await controller.register(body);
+  response.status(200).json(data);
 });
 
 export default app;
