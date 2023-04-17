@@ -1,7 +1,5 @@
-import * as dotenv from 'dotenv';
+require('dotenv-vault-core').config();
 import { Sequelize } from 'sequelize';
-
-dotenv.config();
 
 export const db = new Sequelize(
   process.env.DB_NAME ?? '',
