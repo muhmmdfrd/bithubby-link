@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
+import mysql2 from 'mysql2';
 
 dotenv.config();
 
@@ -10,6 +11,6 @@ export const db = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    dialectModule: require('mysql2'),
+    dialectModule: mysql2,
   }
 );

@@ -20,6 +20,7 @@ app.use('/api/test', function (req, res, next) {
 app.listen(process.env.PORT, async () => {
   console.log(`Node server started running at ${process.env.PORT}`);
   try {
+    await db.sync();
     await db.authenticate();
     console.log('Connection has been established successfully.');
   } catch (error) {
