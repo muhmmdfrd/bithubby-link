@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
-import { UrlShortenController } from '../controllers';
+import { SubscriberController } from '../controllers';
 
 const app = express.Router();
-const controller = new UrlShortenController();
+const controller = new SubscriberController();
 
 app.get('/', async function (request: Request, response: Response) {
   const data = await controller.get();
@@ -19,16 +19,14 @@ app.post('/', async function (request: Request, response: Response) {
   }
 });
 
-app.post('/code', async function name(request: Request, response: Response) {
-  const data = await controller.getByCode(request.body.code);
+app.post('/notify', async function (request: Request, response: Response) {
+  const success = await controller.notifyTelegram(request.body);
 
-  if (data) {
-    response.redirect(data.url ?? '');
+  if (success) {
+    response.status(200).json({ message: 'Users notified' });
   } else {
-    response.status(404).json({ message: 'URL not found.' });
+    response.status(500).json({ message: 'Failed to notify users.' });
   }
 });
-
-app.put('/', async function () {});
 
 export default app;
