@@ -1,5 +1,9 @@
+import { TelegramHelper } from './../helpers';
 import { db } from '../../db';
+import dotenv from 'dotenv';
 import { initModels, subscribers } from '../models/init-models';
+import { Telegraf } from 'telegraf';
+import { INotifyRequest } from './../custom/dto/notify_request';
 
 export default class SubscriberController {
   async get(): Promise<subscribers[]> {
@@ -16,12 +20,19 @@ export default class SubscriberController {
     return await initModels(db).subscribers.create(body);
   }
 
-  async notifyTelegram(): Promise<boolean> {
-    const ids = await initModels(db).subscribers.findAll({
+  async notifyTelegram(request: INotifyRequest): Promise<boolean> {
+    dotenv.config();
+    const datas = await initModels(db).subscribers.findAll({
       attributes: ['telegram_id'],
     });
+    const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
-    ids.forEach(function (id) {});
+    const telegramHelper = new TelegramHelper(bot);
+
+    datas.forEach(function (data) {
+      const message = `Halo pembaca, bithubby.com sudah update post yang berjudul '${request.message}'. Selamat membaca.`;
+      telegramHelper.sendMessage(data.telegram_id, message);
+    });
 
     return true;
   }
