@@ -1,11 +1,10 @@
-import * as dotenv from 'dotenv';
+require('dotenv-vault-core').config();
 import express from 'express';
 import * as bodyParser from 'body-parser';
 import { urlShortenRouter } from './src/routes';
 import { db } from './db';
 
 const app = express();
-dotenv.config();
 
 app.use(bodyParser.json());
 
