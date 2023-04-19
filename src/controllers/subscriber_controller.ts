@@ -5,6 +5,7 @@ import { initModels, subscribers } from '../models/init-models';
 import { Telegraf } from 'telegraf';
 import { INotifyRequest } from './../custom/dto/notify_request';
 import { IWebhookRequest } from './../../src/custom/dto/webhook_request';
+import { IEnterRequest } from './../custom/dto/enter_request';
 
 export default class SubscriberController {
   private bot = new Telegraf(process.env.TELEGRAM_TOKEN);
@@ -37,6 +38,11 @@ export default class SubscriberController {
     });
 
     return true;
+  }
+
+  async enter(value: IEnterRequest): Promise<void> {
+    const message: string = `${value.visitorId} enter your website. Platform: ${value.platform} | user-agent: ${value.userAgent}`;
+    this.bot.telegram.sendMessage('612060297', message);
   }
 
   async register(update: IWebhookRequest): Promise<void> {

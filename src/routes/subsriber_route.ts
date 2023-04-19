@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { SubscriberController } from '../controllers';
-import debug from 'debug';
 import { IWebhookRequest } from './../custom/dto/webhook_request';
+import { IEnterRequest } from './../../src/custom/dto/enter_request';
 
 const app = express.Router();
 const controller = new SubscriberController();
@@ -35,6 +35,12 @@ app.post('/register', async function (request: Request, response: Response) {
   const body = request.body as IWebhookRequest;
   const data = await controller.register(body);
   response.status(200).json(data);
+});
+
+app.post('/enter', async function (request: Request, response: Response) {
+  const body = request.body as IEnterRequest;
+  await controller.enter(body);
+  response.status(200).json({ message: 'SENT' });
 });
 
 export default app;
