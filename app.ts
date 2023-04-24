@@ -7,15 +7,16 @@ import { Telegraf } from 'telegraf';
 import cors from 'cors';
 import morgan from 'morgan';
 import path from 'path';
-import fs from 'fs';
+import rfs from 'rotating-file-stream';
 
 dotenv.config();
 const app = express();
 app.use(cors());
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
-  flags: 'a',
+var accessLogStream = rfs.createStream('access.log', {
+  interval: '1d',
+  path: path.join(__dirname, 'log'),
 });
 
 app.use(bot.webhookCallback('/register'));
