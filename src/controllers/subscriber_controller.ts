@@ -66,6 +66,7 @@ export default class SubscriberController {
       where: {
         telegram_id: id,
       },
+      attributes: ['telegram_id'],
     });
 
     if (exist) {
