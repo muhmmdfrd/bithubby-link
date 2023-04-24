@@ -2,14 +2,11 @@ import { TelegramHelper } from './../helpers';
 import { db } from '../../db';
 import dotenv from 'dotenv';
 import { initModels, subscribers } from '../models/init-models';
-import { Telegraf } from 'telegraf';
 import { INotifyRequest } from './../custom/dto/notify_request';
 import { IWebhookRequest } from './../../src/custom/dto/webhook_request';
 import { IEnterRequest } from './../custom/dto/enter_request';
 
 export default class SubscriberController {
-  private bot = new Telegraf(process.env.TELEGRAM_TOKEN);
-
   async get(): Promise<subscribers[]> {
     return await initModels(db).subscribers.findAll({
       attributes: ['id', 'name', 'telegram_id', 'email'],
@@ -30,7 +27,7 @@ export default class SubscriberController {
       attributes: ['telegram_id'],
     });
 
-    const telegramHelper = new TelegramHelper(this.bot);
+    const telegramHelper = new TelegramHelper(process.env.TELEGRAM_TOKEN);
 
     datas.forEach(function (data) {
       const message = `Halo pembaca, bithubby.com sudah update post yang berjudul '${request.message}'. Selamat membaca.`;
@@ -41,13 +38,18 @@ export default class SubscriberController {
   }
 
   async enter(value: IEnterRequest): Promise<void> {
+    dotenv.config();
+
+    const telegramHelper = new TelegramHelper(process.env.TELEGRAM_TOKEN);
     const message: string = `${value.visitorId} enter your website. Platform: ${value.platform} | user-agent: ${value.userAgent}`;
-    this.bot.telegram.sendMessage('612060297', message);
+    telegramHelper.sendMessage('612060297', message);
   }
 
   async register(update: IWebhookRequest): Promise<void> {
+    dotenv.config();
+    const telegramHelper = new TelegramHelper(process.env.TELEGRAM_TOKEN);
     if (update.message.text !== '/start') {
-      this.bot.telegram.sendMessage(
+      telegramHelper.sendMessage(
         update.message.chat.id,
         "Silakan ketik '/start' untuk menghubungkan Telegram dengan bithubby.com"
       );
@@ -70,7 +72,7 @@ export default class SubscriberController {
     });
 
     if (exist) {
-      this.bot.telegram.sendMessage(
+      telegramHelper.sendMessage(
         update.message.chat.id,
         `${fullName}, Anda sudah terhubung dengan bithubby.com. Stay tuned :)`
       );
@@ -86,12 +88,12 @@ export default class SubscriberController {
       const result = await data.save();
 
       if (result) {
-        this.bot.telegram.sendMessage(
+        telegramHelper.sendMessage(
           update.message.chat.id,
           `Selamat ${fullName}, Anda sudah berhasil terhubung dengan bithubby.com. Selamat membaca dan stay tuned. Terima kasih :)`
         );
 
-        this.bot.telegram.sendMessage(
+        telegramHelper.sendMessage(
           '612060297',
           `${fullName} (${update.message.from.username}) mendaftar di bithubby.com`
         );

@@ -1,10 +1,17 @@
-import { Context, Telegraf } from 'telegraf';
-import { Update } from 'telegraf/typings/core/types/typegram';
+import axios from 'axios';
 
 export default class TelegramHelper {
-  constructor(private bot: Telegraf<Context<Update>>) {}
+  constructor(private token: string) {}
 
   async sendMessage(chatId: string | number, text: string): Promise<void> {
-    await this.bot.telegram.sendMessage(chatId, text);
+    const url = `https://api.telegram.org/bot${this.token}/sendMessage?chat_id=${chatId}&text=${text}`;
+    axios
+      .post(url)
+      .then((response) => {
+        console.log('Message sent:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error sending message:', error.response.data);
+      });
   }
 }

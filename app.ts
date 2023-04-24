@@ -3,29 +3,23 @@ import dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
 import { SubscriberRoute } from './src/routes';
 import { db } from './db';
-import { Telegraf } from 'telegraf';
 import cors from 'cors';
-import morgan from 'morgan';
-import path from 'path';
-import rfs from 'rotating-file-stream';
+import { TelegramHelper } from './src/helpers';
 
 dotenv.config();
+
 const app = express();
 app.use(cors());
-const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
-
-var accessLogStream = rfs.createStream('access.log', {
-  interval: '1d',
-  path: path.join(__dirname, 'log'),
-});
-
-app.use(bot.webhookCallback('/register'));
-bot.telegram.setWebhook('https://url.bithubby.com/api/subscribers/register');
-app.use(morgan('combined', { stream: accessLogStream }));
 app.use(bodyParser.json());
 
 app.get('/', function (req, res, next) {
   res.status(200).json({ message: 'OK' });
+});
+
+app.post('/', function (req, res, next) {
+  const telegramHelper = new TelegramHelper(process.env.TELEGRAM_TOKEN);
+  telegramHelper.sendMessage(req.body.chatId, req.body.text);
+  res.status(200).json({ message: 'Sent!' });
 });
 
 app.use('/api/subscribers', SubscriberRoute);
