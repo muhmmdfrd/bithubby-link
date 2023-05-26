@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
-import { SubscriberRoute } from './src/routes';
+import { NotifyRoute, SubscriberRoute } from './src/routes';
 import { db } from './db';
 import cors from 'cors';
 import { TelegramHelper } from './src/helpers';
@@ -23,6 +23,7 @@ app.post('/', function (req, res, next) {
 });
 
 app.use('/api/subscribers', SubscriberRoute);
+app.use('/api/notify', NotifyRoute);
 
 app.listen(process.env.PORT, async () => {
   console.log(`Node server started running at ${process.env.PORT}`);
