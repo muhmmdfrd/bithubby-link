@@ -27,10 +27,10 @@ app.use('/api/notify', NotifyRoute);
 
 app.listen(process.env.PORT, async () => {
   console.log(`Node server started running at ${process.env.PORT}`);
-  try {
-    await db.authenticate();
-    console.log('Connection has been established successfully.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
+  // try {
+  //   await db.authenticate();
+  //   console.log('Connection has been established successfully.');
+  // } catch (error) {
+  //   console.error('Unable to connect to the database:', error);
+  // }
 });

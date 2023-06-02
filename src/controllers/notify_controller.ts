@@ -3,7 +3,6 @@ import { getFirestore } from 'firebase/firestore';
 import { query, collection, getDocs } from 'firebase/firestore';
 import axios from 'axios';
 import { IFirebaseRequest } from '../custom/dto/firebase_request';
-import { IFirebaseResponse } from '../custom/response/firebase_response';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDCxebpiUJ75-d2dwuNFLjdJR25uFeOOMs',
@@ -22,15 +21,18 @@ const apiKey =
   'AAAAeh_78tU:APA91bEwwyAv6hnkA886X0j4J6N19pA3b-3zoFcQGQpc4uAvTEz9kpb55d2jTxpjxYYa5bPk0pQGWP7WRYe0rUVod1cn9g9Zphm_S-N62Y8QOyCZB6XhoScpUHpNlcTlrhBEtX1f-WL8';
 
 export default class NotifyController {
-  async post(request: IFirebaseRequest): Promise<void> {
+  async post(
+    request: IFirebaseRequest
+  ): Promise<{ success: number; failed: number }> {
     const q = query(collection(db, collectionName));
     const querySnapshot = await getDocs(q);
 
+    let success = 0;
+    let failed = 0;
+
     querySnapshot.forEach(async (doc) => {
       request.to = doc.data().firebase_token;
-
-      const data = JSON.stringify(request);
-      const config = {
+      const response = await axios.request({
         method: 'post',
         maxBodyLength: Infinity,
         url: 'https://fcm.googleapis.com/fcm/send',
@@ -38,10 +40,20 @@ export default class NotifyController {
           Authorization: `key=${apiKey}`,
           'Content-Type': 'application/json',
         },
-        data: data,
-      };
+        data: JSON.stringify(request),
+      });
+      const responseData = response.data;
 
-      await axios.request<IFirebaseRequest, IFirebaseResponse>(config);
+      if (responseData.success !== 1) {
+        failed++;
+      } else {
+        success++;
+      }
     });
+
+    return {
+      failed: failed,
+      success: success,
+    };
   }
 }
